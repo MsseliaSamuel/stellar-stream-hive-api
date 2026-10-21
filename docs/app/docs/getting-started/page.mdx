@@ -192,6 +192,16 @@ start, not just the portion that accrues after the cliff.
 The API's indexer reads contract events from the Soroban RPC (`SOROBAN_RPC_URL`
 environment variable, default: testnet) -- see [`api/README.md`](https://github.com/Stellar-Hive/stellar-stream-hive-api/blob/main/api/README.md).
 
+<CalloutBox variant="warning" title="Backfill window vs. RPC event retention">
+  The indexer's backfill window, `INDEXER_BACKFILL_LEDGERS` (default: 17,280
+  ledgers, about a day), must fit inside the event retention window of the
+  Soroban RPC you point `SOROBAN_RPC_URL` at. That retention window varies by
+  RPC provider, so check your provider's limits before raising the value or
+  switching providers. If the backfill window exceeds what the RPC retains, or
+  you move to a provider with a shorter window, the indexer can silently miss
+  history -- it will have no events to replay for that range.
+</CalloutBox>
+
 ## Deployed contract addresses
 
 <CalloutBox variant="info" title="Testnet deployed">
