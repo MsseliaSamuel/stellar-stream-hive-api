@@ -87,6 +87,11 @@ the Stream contract during `create_stream`, on the sender's behalf -- `from`
 is the stream's sender, and it is `from` (not the Stream contract) whose
 authorization is actually required, since it's their tokens being moved.
 
+Each stream is bound to the first token it is funded with. Later deposits,
+releases, or refunds with a different token for the same `stream_id` return
+`TokenMismatch`. This pinning prevents a stream's balance from being mixed
+with multiple asset types.
+
 - **Auth:** `from.require_auth()`.
 - **Errors:** `InvalidAmount` if `amount <= 0`; `TokenMismatch` if `token` does not match
   what's locked for this stream; propagates the token contract's own errors if
@@ -150,6 +155,32 @@ cross-check: this should always equal that token's balance held by the Vault
 contract's own account.
 
 - **Auth:** none (read-only).
+
+### `get_stream_contract`
+
+```rust
+pub fn get_stream_contract(env: Env) -> Address
+```
+
+Returns the address of the Stream contract authorized to call `release` and
+`refund`. Useful for verifying a deployment's wiring and confirming that the
+correct contract has the custody authority.
+
+- **Auth:** none (read-only).
+- **Errors:** `NotInitialized` if the Vault has not yet been initialized.
+
+### `get_admin`
+
+```rust
+pub fn get_admin(env: Env) -> Address
+```
+
+Returns the address of the admin account authorized to call `set_stream_contract`.
+Useful for auditing deployment configuration and confirming who holds the
+repointing authority.
+
+- **Auth:** none (read-only).
+- **Errors:** `NotInitialized` if the Vault has not yet been initialized.
 
 ## Events emitted
 
