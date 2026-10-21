@@ -179,3 +179,33 @@ request could do here that a same-origin one couldn't.
 | `INDEXER_BACKFILL_LEDGERS` | `17280` | How many ledgers back the indexer starts from on boot. |
 | `CORS_ALLOWED_ORIGINS` | _(unset -- any origin)_ | Comma-separated list of allowed origins; unset or `*` means any origin. |
 | `RUST_LOG` | `info` | Log filter for the service (e.g. `debug`, `info`, `warn`). |
+
+## Operations
+
+### Logging
+
+The server initialises tracing with an `EnvFilter` built from `RUST_LOG`, so
+log verbosity is controlled entirely by that variable. If `RUST_LOG` is unset,
+the filter falls back to `info`.
+
+```bash
+# Default level
+RUST_LOG=info cargo run
+
+# Verbose output, including indexer internals
+RUST_LOG=debug cargo run
+
+# Per-crate filters: verbose for the API crate, quieter for its dependencies
+RUST_LOG=stellar_stream_hive_api=debug,tower_http=info cargo run
+```
+
+Per-crate filters use the crate/module names as they appear in the source, so
+you can raise verbosity for one component without flooding the output from
+everything else.
+
+### Graceful shutdown
+
+The server listens for `Ctrl-C` (SIGINT) and, on Unix, SIGTERM. When either
+signal arrives it stops accepting new connections and shuts the HTTP server
+down gracefully rather than terminating abruptly. This is what lets a process
+manager or container runtime stop the service with a normal signal.

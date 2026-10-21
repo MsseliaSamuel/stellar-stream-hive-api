@@ -62,8 +62,11 @@ web app does is privileged or otherwise unavailable to you directly.
    in the same transaction, and your single signature authorizes both the
    contract call and the token transfer into the Vault via Soroban's sub-invocation
    auth (`sender.require_auth()`).
-4. Once confirmed, the new stream appears on your dashboard with status
-   **Pending** (if its start time is in the future) or **Active**.
+4. Once confirmed, the new stream appears on your dashboard with one of the
+   statuses shown by the app's status badge: **Scheduled** (its start time is
+   still in the future), **Active** (accruing), **Cliff pending** (accruing,
+   but nothing is withdrawable until the cliff ledger is reached),
+   **Completed**, or **Cancelled**.
 
 ### Custom token detection
 
@@ -98,9 +101,8 @@ Two pages list the streams tied to your connected wallet:
 - **Sending** (`/sending`) -- streams you created as the sender.
 - **Receiving** (`/receiving`) -- streams where you are the recipient.
 
-Each list can be narrowed with the status filters **All**, **Live**,
-**Completed**, and **Cancelled**, and exported to CSV for record-keeping or
-spreadsheet analysis.
+Each list can be narrowed with status filters and exported to CSV for
+record-keeping or spreadsheet analysis.
 
 <CalloutBox variant="info" title="These lists need the indexer API">
   The **Sending** and **Receiving** pages read from the
@@ -170,7 +172,7 @@ Only visible to the sender, and only when the stream was created with
    streamed amount at cancellation is `0`: the recipient receives `0` and the
    entire `total_amount` (100% of the locked funds) is refunded to the sender.
 3. Confirm and sign with Freighter. Once the transaction lands, the stream's
-   status changes to **Cancelled**, the recipient's already-accrued portion
+   status badge changes to **Cancelled**, the recipient's already-accrued portion
    (if any had vested past the cliff) becomes immediately withdrawable, and the
    remainder is refunded to you in the same transaction.
 
